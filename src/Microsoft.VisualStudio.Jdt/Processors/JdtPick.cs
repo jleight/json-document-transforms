@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.Jdt
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -10,34 +11,73 @@ namespace Microsoft.VisualStudio.Jdt
     /// <summary>
     /// Represents the Pick transformation
     /// </summary>
-    internal class JdtPick : JdtArrayProcessor
+    internal class JdtPick : JdtProcessor
     {
         /// <inheritdoc/>
         public override string Verb { get; } = "pick";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
+        internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
-            var toKeep = new HashSet<string>();
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
 
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
+            JToken transformValue;
+            if (transform.TryGetValue(this.FullVerb, out transformValue))
+            {
+                if (!this.Transform(source, transformValue, logger))
+                {
+                    return;
+                }
+            }
+
+            this.Successor.Process(source, transform, logger);
+        }
+
+        private bool Transform(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
+        {
             switch (transformValue.Type)
             {
                 case JTokenType.String:
-                    toKeep.Add(transformValue.ToString());
+                    this.PickWithStrings(source, new[] { transformValue.ToString() }, logger);
                     break;
 
                 case JTokenType.Array:
-                    transformValue.ToArray().Select(n => n.ToString()).ToList().ForEach(n => toKeep.Add(n));
+                    var array = (JArray)transformValue;
+                    var first = array.First;
+
+                    switch (first.Type)
+                    {
+                        case JTokenType.String:
+                            this.PickWithStrings(source, array.Select(x => x.ToString()), logger);
+                            break;
+
+                        default:
+                            throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidPickValue, transformValue.Type.ToString()), ErrorLocation.Transform, transformValue);
+                    }
+
                     break;
 
                 default:
                     throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidPickValue, transformValue.Type.ToString()), ErrorLocation.Transform, transformValue);
             }
 
+            return true;
+        }
+
+        private bool PickWithStrings(JObject source, IEnumerable<string> propertiesToKeep, JsonTransformationContextLogger logger)
+        {
             source
                 .Properties()
                 .Select(p => p.Name)
-                .Except(toKeep)
+                .Except(propertiesToKeep)
                 .ToList()
                 .ForEach(p => source.Remove(p));
 
