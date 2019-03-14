@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.Jdt
             {
                 // Supported transformations
                 new JdtRecurse(),
+                new JdtPick(),
                 new JdtRemove(),
                 new JdtReplace(),
                 new JdtRename(),

@@ -33,6 +33,8 @@ namespace Microsoft.VisualStudio.Jdt.Tests
         // Directory for Merge transformation test
         private static readonly string MergeTestDirectory = Path.Combine(TestInputDirectory, "Merge");
 
+        private static readonly string PickTestDirectory = Path.Combine(TestInputDirectory, "Pick");
+
         /// <summary>
         /// Gets inputs for the Default transformation
         /// </summary>
@@ -86,6 +88,17 @@ namespace Microsoft.VisualStudio.Jdt.Tests
             get
             {
                 return GetInputs(MergeTestDirectory);
+            }
+        }
+
+        /// <summary>
+        /// Gets inputs for the Pick transformation
+        /// </summary>
+        public static IEnumerable<object[]> GetPickInputs
+        {
+            get
+            {
+                return GetInputs(PickTestDirectory);
             }
         }
 
@@ -147,6 +160,18 @@ namespace Microsoft.VisualStudio.Jdt.Tests
         public void Merge(string testFileName)
         {
             BaseTransformTest(MergeTestDirectory, testFileName);
+        }
+
+        /// <summary>
+        /// Tests the Pick transformation
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
+        [Theory]
+        [MemberData(nameof(GetPickInputs))]
+        public void Pick(string testFileName)
+        {
+            BaseTransformTest(PickTestDirectory, testFileName);
         }
 
         private static IEnumerable<object[]> GetInputs(string testDirectory)

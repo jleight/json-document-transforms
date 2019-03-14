@@ -133,6 +133,10 @@
     <value>Invalid transformation attributes</value>
     <comment>The error message to be displayed if invalid attributes are found</comment>
   </data>
+  <data name="ErrorMessage_InvalidPickValue" xml:space="preserve">
+    <value>{0} is not a valid transform value for Pick</value>
+    <comment>The error message to be displayed when an invalid pick value is applied</comment>
+  </data>
   <data name="ErrorMessage_InvalidRemoveValue" xml:space="preserve">
     <value>{0} is not a valid transform value for Remove</value>
     <comment>The error message to be displayed when an invalid remove value is applied</comment>

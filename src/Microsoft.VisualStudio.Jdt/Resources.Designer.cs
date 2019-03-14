@@ -98,6 +98,15 @@ namespace Microsoft.VisualStudio.Jdt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is not a valid transform value for Pick.
+        /// </summary>
+        internal static string ErrorMessage_InvalidPickValue {
+            get {
+                return ResourceManager.GetString("ErrorMessage_InvalidPickValue", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to {0} is not a valid transform value for Remove.
         /// </summary>
         internal static string ErrorMessage_InvalidRemoveValue {
