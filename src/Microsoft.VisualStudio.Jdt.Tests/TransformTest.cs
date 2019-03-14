@@ -16,22 +16,22 @@ namespace Microsoft.VisualStudio.Jdt.Tests
     public class TransformTest
     {
         // Directory for test inputs, that are JSON files
-        private static readonly string TestInputDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\src\\Microsoft.VisualStudio.Jdt.Tests\\Inputs\\";
+        private static readonly string TestInputDirectory = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "src", "Microsoft.VisualStudio.Jdt.Tests", "Inputs");
 
         // Directory for Default transformation tests
-        private static readonly string DefaultTestDirectory = TestInputDirectory + "Default\\";
+        private static readonly string DefaultTestDirectory = Path.Combine(TestInputDirectory, "Default");
 
         // Directory for Remove transformation test
-        private static readonly string RemoveTestDirectory = TestInputDirectory + "Remove\\";
+        private static readonly string RemoveTestDirectory = Path.Combine(TestInputDirectory, "Remove");
 
         // Directory for Rename transformation test
-        private static readonly string RenameTestDirectory = TestInputDirectory + "Rename\\";
+        private static readonly string RenameTestDirectory = Path.Combine(TestInputDirectory, "Rename");
 
         // Directory for Replace transformation test
-        private static readonly string ReplaceTestDirectory = TestInputDirectory + "Replace\\";
+        private static readonly string ReplaceTestDirectory = Path.Combine(TestInputDirectory, "Replace");
 
         // Directory for Merge transformation test
-        private static readonly string MergeTestDirectory = TestInputDirectory + "Merge\\";
+        private static readonly string MergeTestDirectory = Path.Combine(TestInputDirectory, "Merge");
 
         /// <summary>
         /// Gets inputs for the Default transformation
@@ -167,14 +167,14 @@ namespace Microsoft.VisualStudio.Jdt.Tests
             // Removes the test name to find the source file
             string sourceName = Path.GetFileNameWithoutExtension(testName);
 
-            var transformation = new JsonTransformation(inputsDirectory + testName + ".Transform.json");
+            var transformation = new JsonTransformation(Path.Combine(inputsDirectory, testName + ".Transform.json"));
 
             // Read the resulting stream into a JObject to compare
-            using (Stream result = transformation.Apply(inputsDirectory + sourceName + ".Source.json"))
+            using (Stream result = transformation.Apply(Path.Combine(inputsDirectory, sourceName + ".Source.json")))
             using (StreamReader streamReader = new StreamReader(result))
             using (JsonTextReader jsonReader = new JsonTextReader(streamReader))
             {
-                var expected = JObject.Parse(File.ReadAllText(inputsDirectory + testName + ".Expected.json"));
+                var expected = JObject.Parse(File.ReadAllText(Path.Combine(inputsDirectory, testName + ".Expected.json")));
 
                 var transformed = JObject.Load(jsonReader);
 
