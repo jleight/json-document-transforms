@@ -1,0 +1,10 @@
+﻿{
+  "A": [
+    { "Index": 2 },
+    { "Index": 3 }
+  ],
+  "B": [
+    { "Pick": true },
+    { "Pick": true }
+  ]
+}

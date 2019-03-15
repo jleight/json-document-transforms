@@ -157,6 +157,10 @@
     <value>Path attribute must be a string</value>
     <comment>The error message to be displayed if the wrong value for path is found</comment>
   </data>
+  <data name="ErrorMessage_PickAttributes" xml:space="preserve">
+    <value>Pick requires the path attribute</value>
+    <comment>The error message to be displayed when the wrong attributes are found for pick</comment>
+  </data>
   <data name="ErrorMessage_RemoveAttributes" xml:space="preserve">
     <value>Remove requires the path attribute</value>
     <comment>The error message to be displayed when the wrong attributes are found for remove</comment>

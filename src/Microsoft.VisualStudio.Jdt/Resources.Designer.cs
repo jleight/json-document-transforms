@@ -152,6 +152,15 @@ namespace Microsoft.VisualStudio.Jdt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pick requires the path attribute.
+        /// </summary>
+        internal static string ErrorMessage_PickAttributes {
+            get {
+                return ResourceManager.GetString("ErrorMessage_PickAttributes", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Remove requires the path attribute.
         /// </summary>
         internal static string ErrorMessage_RemoveAttributes {

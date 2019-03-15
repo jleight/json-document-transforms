@@ -13,6 +13,16 @@ namespace Microsoft.VisualStudio.Jdt
     /// </summary>
     internal class JdtPick : JdtProcessor
     {
+        private readonly JdtAttributeValidator attributeValidator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtPick"/> class.
+        /// </summary>
+        public JdtPick()
+        {
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path);
+        }
+
         /// <inheritdoc/>
         public override string Verb { get; } = "pick";
 
@@ -49,6 +59,10 @@ namespace Microsoft.VisualStudio.Jdt
                     this.PickWithStrings(source, new[] { transformValue.ToString() }, logger);
                     break;
 
+                case JTokenType.Object:
+                    this.PickWithAttributes(source, new[] { (JObject)transformValue }, logger);
+                    break;
+
                 case JTokenType.Array:
                     var array = (JArray)transformValue;
                     var first = array.First;
@@ -57,6 +71,10 @@ namespace Microsoft.VisualStudio.Jdt
                     {
                         case JTokenType.String:
                             this.PickWithStrings(source, array.Select(x => x.ToString()), logger);
+                            break;
+
+                        case JTokenType.Object:
+                            this.PickWithAttributes(source, array.Select(x => (JObject)x), logger);
                             break;
 
                         default:
@@ -80,6 +98,73 @@ namespace Microsoft.VisualStudio.Jdt
                 .Except(propertiesToKeep)
                 .ToList()
                 .ForEach(p => source.Remove(p));
+
+            return true;
+        }
+
+        private bool PickWithAttributes(JObject source, IEnumerable<JObject> pickObjects, JsonTransformationContextLogger logger)
+        {
+            var map = new Dictionary<JToken, List<JToken>>();
+
+            foreach (var pickObject in pickObjects)
+            {
+                var attributes = this.attributeValidator.ValidateAndReturnAttributes(pickObject);
+
+                if (!attributes.TryGetValue(JdtAttributes.Path, out var pathToken))
+                {
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_PickAttributes, ErrorLocation.Transform, pickObject);
+                }
+
+                if (pathToken.Type != JTokenType.String)
+                {
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
+                }
+
+                var matches = source
+                    .SelectTokens(pathToken.ToString())
+                    .ToList();
+
+                foreach (var token in matches)
+                {
+                    if (token.Equals(source))
+                    {
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
+                    }
+
+                    switch (token.Parent.Type)
+                    {
+                        case JTokenType.Property:
+                            if (!map.ContainsKey(token.Parent.Parent))
+                            {
+                                map[token.Parent.Parent] = new List<JToken>();
+                            }
+
+                            map[token.Parent.Parent].Add(token.Parent);
+                            break;
+
+                        case JTokenType.Array:
+                            if (!map.ContainsKey(token.Parent))
+                            {
+                                map[token.Parent] = new List<JToken>();
+                            }
+
+                            map[token.Parent].Add(token);
+                            break;
+
+                        default:
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
+                    }
+                }
+            }
+
+            foreach (var pair in map)
+            {
+                pair.Key
+                    .Children()
+                    .Except(pair.Value)
+                    .ToList()
+                    .ForEach(t => t.Remove());
+            }
 
             return true;
         }

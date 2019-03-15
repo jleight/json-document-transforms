@@ -1,0 +1,7 @@
+﻿{
+  "@jdt.pick": [
+    { "@jdt.path": "$.*" },
+    { "@jdt.path": "$.A[?(@.Index > 1)]" },
+    { "@jdt.path": "$.B[?(@.Pick == true)]" }
+  ]
+}

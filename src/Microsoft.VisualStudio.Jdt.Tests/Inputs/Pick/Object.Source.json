@@ -6,8 +6,17 @@
   },
   "C": {
     "C1": {
-      "C11": true
+      "C11": false,
+      "C12": true
     },
     "C2": 2
+  },
+  "D": {
+    "D1": {
+      "Pick": false
+    },
+    "D2": {
+      "Pick": true
+    }
   }
 }

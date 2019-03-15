@@ -1,0 +1,6 @@
+﻿{
+  "@jdt.pick": [
+    { "@jdt.path": "$.D" },
+    { "@jdt.path": "$..[?(@.Pick == true)]" }
+  ]
+}
